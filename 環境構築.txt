@@ -146,3 +146,68 @@ API確認ツール
 brew install --cask postman
 ------------------
 ⑪開発フォルダ
+私はここをおすすめします。
+
+mkdir ~/Develop
+
+移動
+
+cd ~/Develop
+STEP12 GitHubからClone
+git clone https://github.com/leanlab842-art/skill-pilot.git
+
+確認
+
+cd skill-pilot
+ls
+
+README.md
+
+などが見えればOK。
+--------------------
+13 Cursorで開く
+cursor .
+
+これでプロジェクトが開きます。
+---------------------
+14 ディレクトリ作成
+mkdir docs
+mkdir backend
+mkdir frontend
+mkdir scripts
+
+mkdir backend/src
+mkdir backend/tests
+
+mkdir frontend/src
+mkdir frontend/public
+
+mkdir .github
+--------------------
+15 ドキュメント作成
+touch docs/requirements.md
+touch docs/api.md
+touch docs/db.md
+touch docs/architecture.md
+touch docs/screen-design.md
+touch docs/meeting-notes.md
+touch docs/environment-setup.md
+-----------------------------
+16 Git操作
+
+変更確認
+
+git status
+
+追加
+
+git add .
+
+コミット
+
+git commit -m "chore: initialize project structure"
+
+Push
+
+git push
+
