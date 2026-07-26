@@ -78,3 +78,71 @@ gh auth status
 
 ---------------
 ④Cursor
+cursorをダウンロード
+セットアップ完了後cursor上で下記入力実行
+Install 'cursor' command
+
+ターミナルにて下記実行
+cursor --version
+---------------
+⑤.NET SDK
+下記実行
+brew install --cask dotnet-sdk
+
+実行後確認
+dotnet --version
+8.x または 9.x が表示されればOKです。
+私は10.xxxが表示された。あとで確認。
+---------------
+⑥node.js
+下記コマンド実行
+brew install node
+
+確認
+node -v
+確認
+npm -v
+-------------
+⑦Docker Desktop
+brew install --cask docker
+
+その後
+
+Applications
+
+↓
+
+Docker
+
+を起動
+
+初回起動は数分かかります。
+
+確認
+
+docker --version
+------------------
+⑧postgresSQL
+インストール
+
+brew install postgresql@17
+
+起動
+
+brew services start postgresql@17
+
+確認
+
+psql --version
+-----------------
+⑨DBeaver
+GUIでDBを見るためのツールです。
+
+brew install --cask dbeaver-community
+------------------
+⑩postman
+API確認ツール
+
+brew install --cask postman
+------------------
+⑪開発フォルダ
