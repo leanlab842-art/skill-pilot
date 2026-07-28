@@ -11,20 +11,50 @@ AIを活用して転職活動・学習・キャリア形成を支援するWebサ
 ## 技術スタック
 
 ### Backend
+
 - ASP.NET Core
 - Entity Framework Core
 
 ### Frontend
+
 - React
 - TypeScript
 
 ### Database
+
 - PostgreSQL
 
 ### AI
+
 - Claude API
 - OpenAI API（予定）
 
 ## 開発状況
 
 🚧 Development
+
+
+
+## Architecture
+
+Backend
+
+- [ASP.NET](http://ASP.NET) Core
+
+Frontend
+
+- React
+
+- TypeScript
+
+Database
+
+- PostgreSQL
+
+Infrastructure
+
+- Docker
+
+AI
+
+- OpenAI API（予定）
