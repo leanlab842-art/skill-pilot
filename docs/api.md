@@ -8,13 +8,34 @@
 
 ### 認証・認可
 
-- JWTアクセストークンをhttpOnly Cookie(`access_token`、Secure、SameSite=Strict、
-  有効期限1時間)で発行・検証する。XSSによるトークン窃取を防ぐため、フロントのJSからは
-  参照できない形にする。
+- JWTアクセストークンをhttpOnly Cookie(`access_token`、Secure、有効期限1時間)で
+  発行・検証する。XSSによるトークン窃取を防ぐため、フロントのJSからは参照できない形にする。
 - `Users/Me` 系・`Analyses` 系のエンドポイントはすべて認証必須。
 - 認可はJWTから取得したUserIdを起点に行う。自分が所有するリソースのみ操作可能。
   他人のリソースIDを指定した場合は `404 Not Found` を返す(存在を推測させないため
   `403` ではなく `404` を用いる)。
+
+#### Cookieの `SameSite` 属性について(開発環境向けの暫定設定・本番仕様は未確定)
+
+現在の実装(`AuthController.BuildCookieOptions`)は `SameSite=None` を使用している。
+これは**開発環境でフロントエンド(`http://localhost:5173`)とバックエンド
+(`https://localhost:7191`)が別オリジンで動作しているために必要な暫定対応**であり、
+本番環境の仕様として確定したものではない。
+
+- `SameSite=Strict`/`Lax` の場合、別オリジンへのfetchリクエストにCookieが付与されず
+  ログイン後の認証チェックがすべて失敗する(実装時にこの不具合が発生し、`None`へ変更した)
+- `SameSite=None` にすると、CookieはCSRFに対する防御を提供しなくなる。現状はCORSの
+  許可オリジン制限(`Program.cs`の`Cors:AllowedOrigins`)だけがCSRFに対する実質的な防御であり、
+  本来Cookie自体が持つべき保護が失われている
+
+**本番リリース前に、以下のいずれかを決定する必要がある。**
+
+1. フロントエンドとAPIを同一オリジン(同じドメイン、リバースプロキシ等)で配信する構成にし、
+   `SameSite=Strict`または`Lax`に戻す
+2. 別オリジン構成を維持する場合は`SameSite=None`のまま、Originヘッダー検証や
+   CSRFトークン(二重送信Cookieパターン等)を別途実装して補強する
+
+コード側にも同内容のTODOコメントを残している。
 
 ### エラーレスポンス形式
 

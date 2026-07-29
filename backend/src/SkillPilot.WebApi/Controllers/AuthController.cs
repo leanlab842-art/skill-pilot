@@ -79,10 +79,18 @@ public sealed class AuthController : ControllerBase
     {
         HttpOnly = true,
         Secure = true,
-        // フロントエンド(Vite dev server等)とバックエンドは別オリジンで動作する構成のため、
-        // SameSite=Strict/LaxではfetchによるクロスオリジンリクエストにCookieが付与されず
-        // 認証が機能しない。Noneにして、CORSの許可オリジン制限(Program.cs)を主な防御とする。
-        // (SameSite=NoneはSecure=true必須。CSRF対策は今後Originヘッダー検証等の追加を検討)
+        // [開発環境向けの暫定設定。本番仕様として確定したものではない]
+        // 現状はフロントエンド(Vite dev server: http://localhost:5173)とバックエンド
+        // (https://localhost:7191)が別オリジンで動作しており、SameSite=Strict/Laxだと
+        // fetchによるクロスオリジンリクエストにCookieが付与されず認証が機能しないため
+        // Noneにしている。CORSの許可オリジン制限(Program.cs)がCSRFに対する唯一の防御に
+        // なっており、本来Cookie自体が持つべきCSRF耐性が失われている状態。
+        //
+        // TODO(本番リリース前に決定): 以下のいずれかの対応が必要。
+        //   ① フロントエンドとAPIを同一オリジンで配信する構成にし、SameSite=Strict/Laxへ戻す
+        //   ② 別オリジン構成を維持する場合はSameSite=Noneのまま、Originヘッダー検証や
+        //      CSRFトークン(二重送信Cookie等)を別途実装して補強する
+        // 詳細は docs/api.md の「認証・認可」セクションを参照。
         SameSite = SameSiteMode.None,
         Path = "/",
         Expires = expires,
