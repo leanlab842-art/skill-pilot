@@ -79,7 +79,11 @@ public sealed class AuthController : ControllerBase
     {
         HttpOnly = true,
         Secure = true,
-        SameSite = SameSiteMode.Strict,
+        // フロントエンド(Vite dev server等)とバックエンドは別オリジンで動作する構成のため、
+        // SameSite=Strict/LaxではfetchによるクロスオリジンリクエストにCookieが付与されず
+        // 認証が機能しない。Noneにして、CORSの許可オリジン制限(Program.cs)を主な防御とする。
+        // (SameSite=NoneはSecure=true必須。CSRF対策は今後Originヘッダー検証等の追加を検討)
+        SameSite = SameSiteMode.None,
         Path = "/",
         Expires = expires,
     };

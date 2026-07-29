@@ -40,7 +40,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="flex size-7 items-center justify-center rounded-md bg-primary text-sm font-semibold text-primary-foreground">
               SP
             </span>
-            <span className="font-semibold">SkillPilot</span>
+            <span translate="no" className="font-semibold">SkillPilot</span>
           </Link>
         </SidebarHeader>
         <SidebarContent>
@@ -80,7 +80,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <SidebarInset>
         <header className="flex h-14 items-center gap-2 border-b px-4 md:hidden">
           <SidebarTrigger />
-          <span className="font-semibold">SkillPilot</span>
+          <span translate="no" className="font-semibold">SkillPilot</span>
         </header>
         <main className="flex-1 p-4 md:p-8">{children}</main>
       </SidebarInset>
