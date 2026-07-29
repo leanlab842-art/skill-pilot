@@ -74,9 +74,10 @@ public sealed record JobAnalysisDetailDto(
 /// <param name="Status">分析の進行状態。</param>
 /// <param name="MatchRate">必須スキルの充足率(0〜100)。未分析の場合はnull。</param>
 /// <param name="CreatedAt">作成日時。</param>
-public sealed record JobAnalysisSummaryDto(Guid Id, string CompanyName, string JobTitle, AnalysisStatus Status, int? MatchRate, DateTimeOffset CreatedAt)
+/// <param name="UpdatedAt">更新日時。</param>
+public sealed record JobAnalysisSummaryDto(Guid Id, string CompanyName, string JobTitle, AnalysisStatus Status, int? MatchRate, DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt)
 {
     /// <summary>エンティティからDTOへ変換する。</summary>
     public static JobAnalysisSummaryDto FromEntity(JobAnalysis entity) =>
-        new(entity.Id, entity.CompanyName, entity.JobTitle, entity.Status, entity.MatchRate?.Value, entity.CreatedAt);
+        new(entity.Id, entity.CompanyName, entity.JobTitle, entity.Status, entity.MatchRate?.Value, entity.CreatedAt, entity.UpdatedAt);
 }

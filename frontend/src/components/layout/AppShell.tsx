@@ -82,7 +82,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <SidebarTrigger />
           <span translate="no" className="font-semibold">SkillPilot</span>
         </header>
-        <main className="flex-1 p-4 md:p-8">{children}</main>
+        <main className="min-w-0 flex-1 p-4 md:p-8">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

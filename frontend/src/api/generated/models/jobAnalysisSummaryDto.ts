@@ -16,4 +16,5 @@ export interface JobAnalysisSummaryDto {
   /** @nullable */
   matchRate?: number | null;
   createdAt?: string;
+  updatedAt?: string;
 }
