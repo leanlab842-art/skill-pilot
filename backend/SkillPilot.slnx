@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SkillPilot.Application/SkillPilot.Application.csproj" />
+    <Project Path="src/SkillPilot.Domain/SkillPilot.Domain.csproj" />
+    <Project Path="src/SkillPilot.Infrastructure/SkillPilot.Infrastructure.csproj" />
+    <Project Path="src/SkillPilot.WebApi/SkillPilot.WebApi.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SkillPilot.Application.Tests/SkillPilot.Application.Tests.csproj" />
+    <Project Path="tests/SkillPilot.Domain.Tests/SkillPilot.Domain.Tests.csproj" />
+    <Project Path="tests/SkillPilot.Infrastructure.Tests/SkillPilot.Infrastructure.Tests.csproj" />
+    <Project Path="tests/SkillPilot.WebApi.Tests/SkillPilot.WebApi.Tests.csproj" />
+  </Folder>
+</Solution>
