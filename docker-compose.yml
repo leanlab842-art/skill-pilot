@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: skillpilot_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      # ローカルにインストール済みのPostgreSQL(setup.txt参照)が既に5432を使っているため、
+      # ホスト側は5433にマッピングする(コンテナ内部は標準の5432のまま)。
+      - "5433:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
