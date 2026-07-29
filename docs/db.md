@@ -60,6 +60,7 @@ erDiagram
         text Description
         smallint Week
         boolean Completed
+        timestamptz CompletedAt
         timestamptz CreatedAt
         timestamptz UpdatedAt
     }
@@ -166,6 +167,7 @@ erDiagram
 | Description | text | NULL |
 | Week | smallint | NOT NULL, CHECK (Week >= 1) |
 | Completed | boolean | NOT NULL, default false |
+| CompletedAt | timestamptz | NULL(完了日時。将来の進捗可視化機能に備える) |
 | CreatedAt | timestamptz | NOT NULL, default now() |
 | UpdatedAt | timestamptz | NOT NULL, default now() |
 

@@ -1,0 +1,18 @@
+<Project>
+
+  <!-- backend配下の全プロジェクトに共通する設定。各csprojでの重複記述を避けるため。 -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+
+    <!-- XMLコメントをドキュメントファイルとして出力する(将来Swaggerの説明文に利用する)。
+         全publicメンバーへのコメント付与は強制せず、CS1591(コメント欠落警告)は抑制する。 -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+</Project>
