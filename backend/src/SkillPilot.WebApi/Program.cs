@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -16,7 +17,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    // Enum(Status/Level/Category等)をJSON上は数値ではなく文字列名で表現する
+    // (docs/api.mdで "Pending" のような文字列を返す前提としているため)。
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -57,6 +61,11 @@ builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        // 既定ではJwtBearerHandlerが "sub" 等の短いクレーム名をClaimTypes.*の長いURIに
+        // 自動変換してしまう(DefaultInboundClaimTypeMap)。JwtTokenGeneratorが発行した
+        // クレーム名(JwtRegisteredClaimNames.Sub)をそのまま読み取れるよう無効化する。
+        options.MapInboundClaims = false;
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
