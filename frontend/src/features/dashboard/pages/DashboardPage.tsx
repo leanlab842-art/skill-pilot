@@ -5,6 +5,7 @@ import { useGetApiV1Analyses } from "@/api/generated/job-analysis/job-analysis";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
+import { PageHeader } from "@/components/common/PageHeader";
 import { SimplePagination } from "@/components/common/SimplePagination";
 import { AnalysisListItem } from "@/features/dashboard/components/AnalysisListItem";
 import { AnalysisListItemSkeleton } from "@/features/dashboard/components/AnalysisListItemSkeleton";
@@ -25,18 +26,16 @@ export function DashboardPage() {
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-6">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold text-foreground">求人分析履歴</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            これまでにAI分析した求人の一覧です。
-          </p>
-        </div>
-        <Button nativeButton={false} render={<Link to="/analyses/new" />}>
-          <Plus />
-          新しく分析する
-        </Button>
-      </header>
+      <PageHeader
+        title="求人分析履歴"
+        description="これまでにAI分析した求人の一覧です。"
+        action={
+          <Button nativeButton={false} render={<Link to="/analyses/new" />}>
+            <Plus />
+            新しく分析する
+          </Button>
+        }
+      />
 
       {isPending ? (
         <div className="space-y-2" aria-busy="true" aria-label="読み込み中">

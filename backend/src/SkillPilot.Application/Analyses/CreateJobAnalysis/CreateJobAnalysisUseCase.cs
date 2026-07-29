@@ -35,8 +35,9 @@ public sealed class CreateJobAnalysisUseCase : ICreateJobAnalysisUseCase
     /// <inheritdoc />
     public async Task<Result<JobAnalysisDetailDto>> ExecuteAsync(Guid userId, CreateJobAnalysisRequest request, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(request.JobDescription))
-            return Error.Validation("JOB_DESCRIPTION_REQUIRED", "求人本文は必須です。");
+        var validationError = JobPostingValidator.Validate(request.CompanyName, request.JobTitle, request.JobUrl, request.JobDescription);
+        if (validationError is not null)
+            return validationError;
 
         var analysis = new JobAnalysis(userId, request.CompanyName, request.JobTitle, request.JobUrl, request.JobDescription);
 
