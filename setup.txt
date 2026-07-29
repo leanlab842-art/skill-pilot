@@ -211,3 +211,230 @@ Push
 
 git push
 
+
+起動方法
+========================================
+SkillPilot 起動・停止手順
+========================================
+
+【前提条件】
+・Docker Desktop が起動していること
+・.NET SDK がインストールされていること
+・Node.js がインストールされていること
+
+========================================
+① プロジェクトへ移動
+========================================
+
+cd ~/Develop/skill-pilot
+
+
+========================================
+② PostgreSQL(Docker)を起動
+========================================
+
+docker compose up -d
+
+起動確認
+
+docker ps
+
+「skill-pilot-db」が Up になっていればOK
+
+
+========================================
+③ バックエンド(API)起動
+========================================
+
+新しいターミナルを開く
+
+cd ~/Develop/skill-pilot/backend
+
+dotnet run --project src/SkillPilot.WebApi
+
+起動すると以下のように表示されます
+
+Now listening on:
+https://localhost:7191
+
+Swagger
+
+https://localhost:7191/swagger
+
+
+ 1点だけ補足です。Ai:Claude:ApiKeyがdummy-not-setというプレースホルダー値のままのため、
+  実際にフォームから求人を登録するとAI分析は「失敗」ステータスになります(これはアプリの
+  バグではなく、想定通りの動作です — 求人登録・DB保存・画面遷移・エラー表示までのパイプ
+  ライン自体は正常に動いています)。実際のAI分析結果(マッチ率・スキル抽出・学習ロードマッ
+  プ)を試したい場合は、以下でご自身のClaude APIキーを設定してください。
+
+  cd backend/src/SkillPilot.WebApi
+  dotnet user-secrets set "Ai:Claude:ApiKey" "sk-ant-..."
+
+  設定後はbackendの再起動が必要です。なお、動作確認用に作成したテストユーザー・求人デー
+  タはすべて削除済みです(元々あったtest@example.comのみ残っています)。
+
+========================================
+④ フロントエンド起動
+========================================
+
+さらに新しいターミナルを開く
+
+cd ~/Develop/skill-pilot/frontend
+
+※初回のみ
+
+npm install
+
+起動
+
+npm run dev
+
+起動すると
+
+http://localhost:5173
+
+と表示されます。
+
+
+========================================
+⑤ ブラウザで開く
+========================================
+
+http://localhost:5173
+
+
+========================================
+ログイン情報
+========================================
+
+テストユーザー①
+
+メールアドレス
+test@example.com
+
+パスワード
+P@ssw0rd123
+
+
+または
+
+
+テストユーザー②
+
+メールアドレス
+validate-test@example.com
+
+パスワード
+Test1234!
+
+  - メールアドレス: demo@example.com
+  - パスワード: Demo1234!
+========================================
+停止方法
+========================================
+
+■ フロントエンド
+
+Ctrl + C
+
+
+■ バックエンド
+
+Ctrl + C
+
+
+■ Docker(PostgreSQL)
+
+docker compose down
+
+
+========================================
+毎回の起動手順
+========================================
+
+① Docker起動
+
+docker compose up -d
+
+↓
+
+② Backend起動
+
+cd backend
+
+dotnet run --project src/SkillPilot.WebApi
+
+↓
+
+③ Frontend起動
+
+cd frontend
+
+npm run dev
+
+↓
+
+④ ブラウザ
+
+http://localhost:5173
+
+
+========================================
+毎回の停止手順
+========================================
+
+① Frontend
+
+Ctrl + C
+
+↓
+
+② Backend
+
+Ctrl + C
+
+↓
+
+③ Docker
+
+docker compose down
+
+
+========================================
+困った時
+========================================
+
+Dockerが起動しているか確認
+
+docker ps
+
+
+Backendが起動しない場合
+
+dotnet build
+
+
+Frontendが起動しない場合
+
+npm install
+
+npm run dev
+
+
+========================================
+アクセス先一覧
+========================================
+
+Frontend
+http://localhost:5173
+
+Backend API
+https://localhost:7191
+
+Swagger
+https://localhost:7191/swagger
+
+PostgreSQL
+localhost:5433
+
