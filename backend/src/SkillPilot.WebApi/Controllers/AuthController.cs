@@ -55,14 +55,32 @@ public sealed class AuthController : ControllerBase
         if (!result.IsSuccess)
             return result.ToActionResult(this);
 
-        Response.Cookies.Append(AccessTokenCookieName, result.Value.AccessToken, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTimeOffset.UtcNow.AddMinutes(_jwtOptions.ExpiryMinutes),
-        });
+        Response.Cookies.Append(AccessTokenCookieName, result.Value.AccessToken, BuildCookieOptions(
+            DateTimeOffset.UtcNow.AddMinutes(_jwtOptions.ExpiryMinutes)));
 
         return Ok(result.Value);
     }
+
+    /// <summary>ログアウトする。アクセストークンのCookieを削除する。</summary>
+    /// <remarks>
+    /// ドメインロジックを持たない(Cookie削除のみ)ため、UseCaseを設けずController内で完結させる。
+    /// </remarks>
+    [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public IActionResult Logout()
+    {
+        // Deleteは発行時と同じ属性(Path等)のCookieOptionsを指定しないとブラウザ側で
+        // 削除対象と認識されないことがあるため、Login発行時と揃える。
+        Response.Cookies.Delete(AccessTokenCookieName, BuildCookieOptions(DateTimeOffset.UnixEpoch));
+        return NoContent();
+    }
+
+    private static CookieOptions BuildCookieOptions(DateTimeOffset expires) => new()
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.Strict,
+        Path = "/",
+        Expires = expires,
+    };
 }
