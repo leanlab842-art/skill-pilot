@@ -492,17 +492,21 @@ public sealed class RegisterUserUseCase : IRegisterUserUseCase
 
 Domain Service(`SkillGapCalculator`)を新たに導入する。「AIが抽出した必要スキルとユーザーの
 保有スキルを比較し、不足スキル・マッチ率を算出する」ロジックは、特定の集約1つに属さない
-横断的なドメインルールのため、Domain層のサービスクラスとして切り出す(外部依存を持たない
-純粋なロジックのため、Interfaceを介さず具象クラスとして直接利用してよい。DIPが必要になるのは
-外部I/Oを持つ場合)。
+横断的なドメインルールのため、Domain層のサービスクラスとして切り出す。インスタンスの状態を
+一切持たない純粋な計算のため`static`クラスとして実装した(実装時にアナライザCA1822の指摘を
+受けて確定した設計。DIコンテナへの登録は不要)。将来もし外部設定(重み付けポリシー等)への
+依存が必要になった場合は、`static`から`IUserSkillRepository`等と同様のインターフェース+DI
+登録に切り替える。メソッドの入出力(引数・戻り値の型)は変わらないため、移行時の影響は
+呼び出し側の書き換え(`SkillGapCalculator.Calculate(...)` → `_skillGapCalculator.Calculate(...)`)
+に限定できる。
 
 ```csharp
 // Domain/Services/SkillGapCalculator.cs
 public readonly record struct RequiredSkillInput(SkillName Name, SkillLevel Level, SkillCategory Category);
 
-public sealed class SkillGapCalculator
+public static class SkillGapCalculator
 {
-    public (IReadOnlyList<SkillResult> SkillResults, MatchRate MatchRate) Calculate(
+    public static (IReadOnlyList<SkillResult> SkillResults, MatchRate MatchRate) Calculate(
         IReadOnlyList<RequiredSkillInput> requiredSkills,
         IReadOnlyList<UserSkill> userSkills)
     {
@@ -545,20 +549,17 @@ public sealed class CreateJobAnalysisUseCase : ICreateJobAnalysisUseCase
     private readonly IJobAnalysisRepository _jobAnalysisRepository;
     private readonly IUserSkillRepository _userSkillRepository;
     private readonly IJobSkillAnalyzer _jobSkillAnalyzer;
-    private readonly SkillGapCalculator _skillGapCalculator;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateJobAnalysisUseCase(
         IJobAnalysisRepository jobAnalysisRepository,
         IUserSkillRepository userSkillRepository,
         IJobSkillAnalyzer jobSkillAnalyzer,
-        SkillGapCalculator skillGapCalculator,
         IUnitOfWork unitOfWork)
     {
         _jobAnalysisRepository = jobAnalysisRepository;
         _userSkillRepository = userSkillRepository;
         _jobSkillAnalyzer = jobSkillAnalyzer;
-        _skillGapCalculator = skillGapCalculator;
         _unitOfWork = unitOfWork;
     }
 
@@ -578,7 +579,7 @@ public sealed class CreateJobAnalysisUseCase : ICreateJobAnalysisUseCase
                 .Select(s => new RequiredSkillInput(SkillName.Create(s.Name), s.Level, s.Category))
                 .ToList();
 
-            var (skillResults, matchRate) = _skillGapCalculator.Calculate(requiredSkills, userSkills);
+            var (skillResults, matchRate) = SkillGapCalculator.Calculate(requiredSkills, userSkills);
             var roadmap = aiResult.Roadmap
                 .Select(r => new LearningRoadmap(FindSkillResultId(r.RelatedSkillName, skillResults), r.Title, r.Description, r.Week))
                 .ToList();
@@ -621,9 +622,9 @@ AI呼び出し〜`CompleteAnalysis`の流れを再実行する(変更が無け�
 | UpdateUserSkillUseCase | IUpdateUserSkillUseCase | IUserSkillRepository, IUnitOfWork |
 | DeleteUserSkillUseCase | IDeleteUserSkillUseCase | IUserSkillRepository, IUnitOfWork |
 | GetJobAnalysesUseCase | IGetJobAnalysesUseCase | IJobAnalysisRepository |
-| CreateJobAnalysisUseCase | ICreateJobAnalysisUseCase | IJobAnalysisRepository, IUserSkillRepository, IJobSkillAnalyzer, IUnitOfWork, `SkillGapCalculator`(Domain) |
+| CreateJobAnalysisUseCase | ICreateJobAnalysisUseCase | IJobAnalysisRepository, IUserSkillRepository, IJobSkillAnalyzer, IUnitOfWork, `SkillGapCalculator.Calculate`(Domain、staticメソッド呼び出し) |
 | GetJobAnalysisDetailUseCase | IGetJobAnalysisDetailUseCase | IJobAnalysisRepository |
-| UpdateJobAnalysisUseCase | IUpdateJobAnalysisUseCase | IJobAnalysisRepository, IUserSkillRepository, IJobSkillAnalyzer, IUnitOfWork, `SkillGapCalculator`(Domain) |
+| UpdateJobAnalysisUseCase | IUpdateJobAnalysisUseCase | IJobAnalysisRepository, IUserSkillRepository, IJobSkillAnalyzer, IUnitOfWork, `SkillGapCalculator.Calculate`(Domain、staticメソッド呼び出し) |
 | DeleteJobAnalysisUseCase | IDeleteJobAnalysisUseCase | IJobAnalysisRepository, IUnitOfWork |
 | CompleteRoadmapItemUseCase | ICompleteRoadmapItemUseCase | IJobAnalysisRepository, IUnitOfWork |
 
@@ -655,7 +656,7 @@ graph TD
 
     subgraph Domain["SkillPilot.Domain"]
         Entities["Entities<br/>(User, JobAnalysis, SkillResult...)"]
-        SkillGapCalculator["SkillGapCalculator<br/>(Domain Service)"]
+        SkillGapCalculator["SkillGapCalculator<br/>(Domain Service, static)"]
         ValueObjects["ValueObjects<br/>(Email, SkillName, MatchRate)"]
     end
 
@@ -671,7 +672,7 @@ graph TD
     UseCases -->|返す| Dtos
     UseCases -->|返す| ResultType
     UseCases -->|操作| Entities
-    UseCases -->|利用| SkillGapCalculator
+    UseCases -->|静的呼び出し| SkillGapCalculator
     SkillGapCalculator -->|操作| Entities
     Entities -->|保持| ValueObjects
 
