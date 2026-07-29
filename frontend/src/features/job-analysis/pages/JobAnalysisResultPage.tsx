@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { Clock, ExternalLink, Inbox } from "lucide-react";
+import { ExternalLink, Inbox } from "lucide-react";
 import { useGetApiV1AnalysesId } from "@/api/generated/job-analysis/job-analysis";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ErrorState } from "@/components/common/ErrorState";
@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { MatchRateHero } from "@/features/job-analysis/components/MatchRateHero";
 import { AnalysisSummaryCard } from "@/features/job-analysis/components/AnalysisSummaryCard";
 import { SkillSection } from "@/features/job-analysis/components/SkillSection";
-import { AnalysisStatus, SkillCategory } from "@/api/generated/models";
+import { AnalysisStatusGate } from "@/features/job-analysis/components/AnalysisStatusGate";
+import { SkillCategory } from "@/api/generated/models";
 import { ApiError } from "@/lib/apiClient";
 
 export function JobAnalysisResultPage() {
@@ -90,41 +91,22 @@ export function JobAnalysisResultPage() {
         }
       />
 
-      {analysis.status === AnalysisStatus.Failed ? (
-        <ErrorState
-          title="AI分析に失敗しました"
-          description="求人本文の分析中にエラーが発生しました。お手数ですが、求人を登録し直してください。"
-          action={
-            <Button variant="outline" size="sm" nativeButton={false} render={<Link to="/" />}>
-              ダッシュボードに戻る
-            </Button>
-          }
-        />
-      ) : analysis.status === AnalysisStatus.Pending ? (
-        <EmptyState
-          icon={Clock}
-          title="分析待ちです"
-          description="この求人はまだAI分析が完了していません。しばらくしてから再読み込みしてください。"
-          action={
-            <Button variant="outline" size="sm" onClick={() => void refetch()}>
-              再読み込み
-            </Button>
-          }
-        />
-      ) : !hasSkills ? (
-        <EmptyState
-          icon={Inbox}
-          title="スキル情報がありません"
-          description="AIが必要スキルを抽出できませんでした。求人本文の内容をご確認ください。"
-        />
-      ) : (
-        <>
-          <MatchRateHero matchRate={analysis.matchRate ?? 0} analysisId={analysis.id ?? ""} />
-          <AnalysisSummaryCard skillResults={analysis.skillResults ?? []} roadmapCount={analysis.roadmap?.length ?? 0} />
-          <SkillSection title="必須スキル" skills={requiredSkills} />
-          <SkillSection title="歓迎スキル" skills={preferredSkills} />
-        </>
-      )}
+      <AnalysisStatusGate status={analysis.status} onRetryPending={() => void refetch()}>
+        {!hasSkills ? (
+          <EmptyState
+            icon={Inbox}
+            title="スキル情報がありません"
+            description="AIが必要スキルを抽出できませんでした。求人本文の内容をご確認ください。"
+          />
+        ) : (
+          <div className="flex flex-col gap-6">
+            <MatchRateHero matchRate={analysis.matchRate ?? 0} analysisId={analysis.id ?? ""} />
+            <AnalysisSummaryCard skillResults={analysis.skillResults ?? []} roadmapCount={analysis.roadmap?.length ?? 0} />
+            <SkillSection title="必須スキル" skills={requiredSkills} />
+            <SkillSection title="歓迎スキル" skills={preferredSkills} />
+          </div>
+        )}
+      </AnalysisStatusGate>
     </div>
   );
 }
